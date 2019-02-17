@@ -85,18 +85,21 @@ def dual_aggregator_conversations(msgs):
     rmsgs = list(reversed(msgs))
     conversations_count = 0
     conversations_time = 0
+    self_started = 0
     start = rmsgs[0]
     last = start
     for i in range(1, len(rmsgs)):
         if rmsgs[i]['date'] > (last['date'] + conv_delay):
             if start != last:  # Don't count 1-message conversations
                 conversations_count += 1
+                self_started += 1 if last['by_me'] else 0
                 conversations_time += last['date'] - start['date']
             start = rmsgs[i]
             last = start
         else:
             last = rmsgs[i]
     return {
+        'self_started': self_started,
         'conversations_count': conversations_count,
         'total_conversations_time': conversations_time,
         'avg_conversation_time': conversations_time / conversations_count,
